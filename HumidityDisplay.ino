@@ -11,46 +11,71 @@ DHT dht11(DHT11PIN, DHT11);
 DHT dht21(DHT21PIN, DHT21);
 
 extern uint8_t SmallFontRus[];                         // Подключаем шрифт SmallFontRus.
-                                                       //
-void setup(){                                          //
+
+void setup()
+{                                          
     Serial.begin(9600);
     dht21.begin();
     dht11.begin();
     myOLED.begin();                                    // Инициируем работу с дисплеем.
     myOLED.setFont(SmallFontRus);                      // Указываем шрифт который требуется использовать для вывода цифр и текста.
-//  myOLED.setCoding(TXT_UTF8);                        // Указываем кодировку текста в скетче. Если на дисплее не отображается Русский алфавит, то ...
-}                                                      // раскомментируйте функцию setCoding и замените параметр TXT_UTF8, на TXT_CP866 или TXT_WIN1251.
-                                                       //
-void loop(){                                           //
+    myOLED.setCoding(TXT_UTF8);                        // Указываем кодировку текста в скетче. Если на дисплее не отображается Русский алфавит, то ...
+                                                       // раскомментируйте функцию setCoding и замените параметр TXT_UTF8, на TXT_CP866 или TXT_WIN1251.
+} // end setup                                         
+                                                  
+void loop()
+{                                           //
     myOLED.clrScr();                                   
 
-    float h21 = getHumidity(DHT21);
-    float h11 = getHumidity(DHT11);
+    // Display Data DHT21 sensor
+    onDisplayFirstSensor();
+
+    // Display Data DHT11 sensor
+    onDisplaySecondSensor();
     
+    delay(5000); 
+} // end loop
+
+void onDisplayFirstSensor()
+{
+    float h21 = getHumidity(DHT21);
     float t21 = getTemperature(DHT21);
-    float t11 = getTemperature(DHT11);
     
     if (isnan(h21) || isnan(t21)) {
-      Serial.println("Ошибка считывания DHT21");
+      myOLED.print("DHT21 NOT FOUND", OLED_C, 1);
       return;
     }
+    
     myOLED.print("DHT21", OLED_C, 0);
     myOLED.print("Влажность: ", 0, 1);
-    myOLED.print(h21, 11, 1);
-    myOLED.print("%", 15, 1);
+    myOLED.print(h21, 65, 1);
+    myOLED.print("%", 97, 1);
     myOLED.print("Температура: ", 0, 2);
-    myOLED.print(t21, 13, 2);
-    myOLED.print("*C ", 16, 2);
+    myOLED.print(t21, 80, 2);
+    myOLED.print("*C ", 115, 2);
+
+    return;
+} // end onDisplayFirstSensor
+
+void onDisplaySecondSensor()
+{
+    float h11 = getHumidity(DHT11);
+    float t11 = getTemperature(DHT11);
     
+    if (isnan(h11) || isnan(t11)) {
+      myOLED.print("DHT11 NOT FOUND", OLED_C, 5);
+      return;
+    }
     myOLED.print("DHT11", OLED_C, 4);
     myOLED.print("Влажность: ", 0, 5);
-    myOLED.print(h21, 11, 5);
-    myOLED.print("%", 15, 5);
+    myOLED.print(h11, 65, 5);
+    myOLED.print("%", 97, 5);
     myOLED.print("Температура: ", 0, 6);
-    myOLED.print(t21, 13, 6);
-    myOLED.print("*C ", 16, 6);
-    delay(5000); 
-}
+    myOLED.print(t11, 80, 6);
+    myOLED.print("*C ", 115, 6);
+
+    return;
+} // end onDisplaySecondSensor
 
 float getHumidity(int type)
 {
@@ -65,7 +90,7 @@ float getHumidity(int type)
   }
 
   return h;
-}
+} // end getHumidity
 
 float getTemperature(int type)
 {
@@ -80,14 +105,14 @@ float getTemperature(int type)
   }
 
   return t;
-}
+} // end getTemperature
 
 bool isDht21Type(int type)
 {
   return type == DHT21;
-}
+} // end isDht21Type
 
 bool isDht11Type(int type)
 {
   return type == DHT11;
-}
+} // end isDht11Type
